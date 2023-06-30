@@ -80,9 +80,10 @@ def concatenate_sort_temp_files_and_write(out_file, tmp_dir, ID):
 
 def MakeWindows(CONTIG, FASTA, bed, bed_out, window):
 	## Pass 1. Get bed file and focus on the selected chromosome (if specified)
+	inFasta = pysam.FastaFile(FASTA)
 	if (bed == ''):
 		# We get the bed file based on all coordenates from reference fasta file
-		inFasta = pysam.FastaFile(FASTA)
+		# inFasta = pysam.FastaFile(FASTA)
 		CONTIG_Names = inFasta.references
 		LIST = [ (x, 1, inFasta.get_reference_length(x)) for x in CONTIG_Names]
 		a = pybedtools.BedTool(LIST)
