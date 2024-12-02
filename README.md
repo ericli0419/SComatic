@@ -1,9 +1,9 @@
 # SComatic
 SComatic is a tool that provides functionalities to detect somatic single-nucleotide mutations in high-throughput single-cell genomics and transcriptomics data sets, such as single-cell RNA-seq and single-cell ATAC-seq.
 
-If you use SComatic (see **License** at the bottom of this page), please cite our publication [Muyas et al. 2022](https://www.biorxiv.org/content/10.1101/2022.11.22.517567v1).
+If you use SComatic (see **License** at the bottom of this page), please cite our publication [Muyas et al. 2023](https://www.nature.com/articles/s41587-023-01863-z).
 
-For further details on SComatic, its assumptions, limitations and applications, please see [Muyas et al. 2022](https://www.biorxiv.org/content/10.1101/2022.11.22.517567v1).
+For further details on SComatic, its assumptions, limitations and applications, please see [Muyas et al. 2023](https://www.nature.com/articles/s41587-023-01863-z).
 
 ![Algorithm](/docs/Algorithm.jpeg)
 
@@ -23,6 +23,11 @@ pip install -r requirements.txt
 ```R
 Rscript r_requirements_install.R
 ```
+If your R version is >= 3.6.0 but < 4, you might have issues installing the `VGAM` package. If this is the case, try this:
+```R
+Rscript r_requirements_install.v3_6.R
+```
+
 - Unpack PoN (Panel of Normals) files:
 ```
 gunzip PoNs/PoN.scRNAseq.hg38.tsv.gz
@@ -48,7 +53,7 @@ The first step consists of splitting the BAM file containing aligned sequencing 
 Step 1 is executed using the script SplitBam/SplitBamCellTypes.py, which has the following parameters:
 
 - List of parameters:
-```
+```python
 python scripts/SplitBam/SplitBamCellTypes.py --help
 usage: SplitBamCellTypes.py [-h] --bam BAM --meta META [--id ID]
                             [--max_nM MAX_NM] [--max_NH MAX_NH]
@@ -102,12 +107,12 @@ In addition to the cell-type specific bam files, this script creates a txt (\*.r
 - **Example:** check [here](/docs/SComaticExample.md) to see how to run this step with an example sample.  
 
 ## Step 2: Collecting base count information
-Base count information for each cell type and for every position if the genome is recorded in a base count matrix indexed by cell types and genomic coordinates. 
+Base count information for each cell type and for every position in the genome is recorded in a base count matrix indexed by cell types and genomic coordinates. 
 
 The command line to run this step is: 
 
 - List of parameters:
-```
+```python
 python scripts/BaseCellCounter/BaseCellCounter.py --help
 usage: BaseCellCounter.py [-h] --bam BAM --ref REF --chrom CHROM
                                    [--out_folder OUT_FOLDER] [--id ID]
@@ -148,6 +153,9 @@ optional arguments:
                         Default = 20
   --min_mq MIN_MQ       Minimum mapping quality required to analyse read.
                         Default = 255
+  --max_dp MAX_DP       Maximum number of reads per genomic site that are read by pysam pileup,
+                        to save time and memory. Set this value to 0 to switch this filter off
+                        (recommended for high-depth sequencing). [Default: 8000]
   --tmp_dir TMP_DIR     Temporary folder for tmp files
 ```
 
@@ -287,6 +295,19 @@ SComatic provides the following additional functionalities, which are described 
 - Computing the number of callable sites per cell type
 - Computing the number of callable sites per cell
 - Computing the genotype for each cell at the variant sites
+- Computing the trinucleotide context background
+- Computing germline genotypes for known variants in single-cell datasets
+
+## [FAQs - Frequently asked questions](/docs/faqs.md)
+This section answers some of the users' most recurrent doubts when running SComatic.
+
+1. [Are the SComatic parameters for scATAC-seq data the same as for scRNA-seq data?](/docs/faqs.md#1-are-the-scomatic-parameters-for-scatac-seq-data-the-same-as-for-scrna-seq-data)
+2. [How can we perform the variant annotation with the SComatic output?](/docs/faqs.md#2-how-can-we-perform-the-variant-annotation-with-the-scomatic-output)
+3. [Can SComatic work with other types of PoN files?](/docs/faqs.md#3-can-scomatic-work-with-other-types-of-pon-files)
+4. [Can we use the calls from other callers to genotype unique cells using SComatic?](/docs/faqs.md#4-can-we-use-the-calls-from-other-callers-to-genotype-unique-cells-using-scomatic)
+5. [How do different cell type labels (e.g. different levels of granularity) affect the SComatic performance?](docs/faqs.md#5-how-do-different-cell-type-labels-eg-different-levels-of-granularity-affect-the-scomatic-performance)
+6. [What does it happen if CellRanger does not properly trim all non-genomic sequences (adapters) from the reads?](/docs/faqs.md#6-what-does-it-happen-if-cellranger-does-not-properly-trim-all-non-genomic-sequences-adapters-from-the-reads)
+7. [How to interpret the SingleCellGenotype.py output?](https://github.com/cortes-ciriano-lab/SComatic/blob/main/docs/faqs.md#7-how-to-interpret-the-singlecellgenotypepy-output)
 
 ## Contact
 If you have any comments or suggestions about SComatic please raise an issue or contact us: 
